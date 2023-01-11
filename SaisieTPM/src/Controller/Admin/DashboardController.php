@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Entity\Champs;
+use App\Entity\Formulaire;
+use App\Entity\TypeChamps;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -42,7 +45,10 @@ class DashboardController extends AbstractDashboardController
 
     public function configureMenuItems(): iterable
     {
-        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-list', User::class);
+        yield MenuItem::linkToUrl('Accueil', 'fa fa-home', "/accueil");
+        yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-user', User::class);
+        yield MenuItem::linkToCrud('Formulaire', 'fas fa-square-check', Formulaire::class);
+        yield MenuItem::linkToCrud('Champs', 'fas fa-list', Champs::class);
+        yield MenuItem::linkToCrud('Type de champs', 'fas fa-font', TypeChamps::class);
     }
 }

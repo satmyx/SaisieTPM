@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -27,6 +29,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\OneToMany(mappedBy: 'relation', targetEntity: Formulaire::class, orphanRemoval: true)]
+    private Collection $formulaires;
+
+    public function __construct()
+    {
+        $this->formulaires = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -96,5 +106,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return Collection<int, Formulaire>
+     */
+    public function getFormulaires(): Collection
+    {
+        return $this->formulaires;
+    }
+
+    public function addFormulaire(Formulaire $formulaire): self
+    {
+        if (!$this->formulaires->contains($formulaire)) {
+            $this->formulaires->add($formulaire);
+            $formulaire->setRelation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFormulaire(Formulaire $formulaire): self
+    {
+        if ($this->formulaires->removeElement($formulaire)) {
+            // set the owning side to null (unless already changed)
+            if ($formulaire->getRelation() === $this) {
+                $formulaire->setRelation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString() {
+        return $this->username;
     }
 }

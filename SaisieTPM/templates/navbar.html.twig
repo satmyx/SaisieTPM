@@ -17,13 +17,30 @@
 					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"/>
 					</svg>
-					{{app.user.username}}
+					{% if app.user %}
+						{{app.user.username}}
+						<ul class="dropdown-menu min-w-max absolute hidden bg-white text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 hidden m-0 bg-clip-padding border-none left-auto right-0 bg-gray-800" aria-labelledby="dropdownMenuButton1">
+							<li>
+								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-green-700 hover:bg-green-100" href="/creationformulaire">Créer un formulaire</a>
+							</li>
+							<li>
+								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-amber-500 hover:bg-orange-100" id="btnMesForm" href="/creationformulaire">Mes formulaires</a>
+							</li>
+							{% if is_granted('ROLE_ADMIN') %}
+								<li>
+									<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-violet-500 hover:bg-violet-100" id="btnPanelAdmin" href="/admin">Panneau d'adminisration</a>
+								</li>
+							{% endif %}
+						</ul>
+					{% else %}
+						<p>Attente de connexion</p>
+					{% endif %}
 				</a>
 			</div>
-			<a class="hover:opacity-80 focus:opacity-80 flex items-center hidden-arrow" href="/logout" id="dropdownMenuButton2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/>
-					</svg>
+			<a class="hover:opacity-80 focus:opacity-80 flex items-center hidden-arrow" href="/logout" id="btnDeconnexion" role="button" aria-expanded="false">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+					<path stroke-linecap="round" stroke-linejoin="round" d="M5.636 5.636a9 9 0 1012.728 0M12 3v9"/>
+				</svg>
 			</a>
 		</div>
 	</div>
