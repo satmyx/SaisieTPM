@@ -2,14 +2,16 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Entity\Champs;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AccueilController extends AbstractController
 {
     #[Route('/accueil', name: 'app_accueil')]
-    public function index(): Response
+    public function index(ManagerRegistry  $doctrine): Response
     {
         return $this->render('accueil/index.html.twig');
     }

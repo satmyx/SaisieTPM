@@ -39,6 +39,25 @@ class ChampsRepository extends ServiceEntityRepository
         }
     }
 
+    /*
+    [- Permet d'obtenir les informations concernant un formulaire -]
+    */
+
+    public function getInfoFormulaire (ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "SELECT formulaire.id, formulaire.nom as nomformulaire, formulaire.relation_id, type_champs.typage, champs.nom 
+        FROM type_champs
+        INNER JOIN champs
+        ON champs.id_type_id = type_champs.id
+        INNER JOIN champs_formulaire
+        ON champs.id = champs_formulaire.champs_id
+        INNER JOIN formulaire
+        ON formulaire.id = champs_formulaire.formulaire_id
+        WHERE formulaire.id  = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $result=$statement->executeQuery(['id' => $id]);
+        return $result->fetchAll();
+    }
 //    /**
 //     * @return Champs[] Returns an array of Champs objects
 //     */

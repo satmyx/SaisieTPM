@@ -33,9 +33,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'relation', targetEntity: Formulaire::class, orphanRemoval: true)]
     private Collection $formulaires;
 
+    #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: RenvoieSaisie::class)]
+    private Collection $renvoieSaisies;
+
     public function __construct()
     {
         $this->formulaires = new ArrayCollection();
+        $this->renvoieSaisies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,5 +144,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __toString() {
         return $this->username;
+    }
+
+    /**
+     * @return Collection<int, RenvoieSaisie>
+     */
+    public function getRenvoieSaisies(): Collection
+    {
+        return $this->renvoieSaisies;
+    }
+
+    public function addRenvoieSaisy(RenvoieSaisie $renvoieSaisy): self
+    {
+        if (!$this->renvoieSaisies->contains($renvoieSaisy)) {
+            $this->renvoieSaisies->add($renvoieSaisy);
+            $renvoieSaisy->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRenvoieSaisy(RenvoieSaisie $renvoieSaisy): self
+    {
+        if ($this->renvoieSaisies->removeElement($renvoieSaisy)) {
+            // set the owning side to null (unless already changed)
+            if ($renvoieSaisy->getUserId() === $this) {
+                $renvoieSaisy->setUserId(null);
+            }
+        }
+
+        return $this;
     }
 }

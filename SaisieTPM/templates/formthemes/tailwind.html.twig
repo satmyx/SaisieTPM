@@ -1,0 +1,55 @@
+
+{% use 'tailwind_2_layout.html.twig' %}
+
+{%- block form_label -%}
+    {%- set label_class = label_class|default('block text-gray-500 uppercase tracking-wider text-sm font-bold') -%}
+    {{- parent() -}}
+{%- endblock -%}
+
+
+{%- block widget_attributes -%}
+    {%- set widget_class = widget_class|default('mt-1 form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none') -%}
+    {{- parent() -}}
+{%- endblock -%}
+
+
+{%- block checkbox_widget -%}
+    {%- set widget_class = widget_class|default('mr-2 rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-offset-0 focus:ring-indigo-200 focus:ring-opacity-50') -%}
+    {{- parent() -}}
+{%- endblock -%}
+
+{%- block checkbox_label -%}
+    {%- set label_class = label_class|default('block text-gray-800') -%}
+    {{- block('form_label') -}}
+{%- endblock -%}
+
+{%- block submit_widget -%}
+    {%- set attr = attr|merge({ class: attr.class|default('inline-block px-6 py-2.5 bg-green-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-green-700 hover:shadow-lg focus:bg-green-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-green-800 active:shadow-lg transition duration-150 ease-in-out') }) -%}
+    {{- parent() -}}
+{%- endblock submit_widget -%}
+
+{%- block date_widget -%}
+    {%- set attr = attr|merge({ class: attr.class|default('form-control block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none') }) -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{- date_pattern|replace({
+                '{{ year }}':  form_widget(form.year),
+                '{{ month }}': form_widget(form.month),
+                '{{ day }}':   form_widget(form.day),
+            })|raw -}}
+        </div>
+    {%- endif -%}
+{%- endblock date_widget -%}
+
+{%- block time_widget -%}
+    {%- if widget == 'single_text' -%}
+        {{ block('form_widget_simple') }}
+    {%- else -%}
+        {%- set vars = widget == 'text' ? { 'attr': { 'size': 1 }} : {} -%}
+        <div {{ block('widget_container_attributes') }}>
+            {{ form_widget(form.hour, vars) }}{% if with_minutes %}:{{ form_widget(form.minute, vars) }}{% endif %}{% if with_seconds %}:{{ form_widget(form.second, vars) }}{% endif %}
+        </div>
+    {%- endif -%}
+{%- endblock time_widget -%}

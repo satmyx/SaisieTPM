@@ -25,9 +25,13 @@ class Formulaire
     #[ORM\ManyToMany(targetEntity: Champs::class, mappedBy: 'choisir')]
     private Collection $champs;
 
+    #[ORM\OneToMany(mappedBy: 'fomulaire_id', targetEntity: RenvoieSaisie::class)]
+    private Collection $renvoieSaisies;
+
     public function __construct()
     {
         $this->champs = new ArrayCollection();
+        $this->renvoieSaisies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -81,6 +85,36 @@ class Formulaire
     {
         if ($this->champs->removeElement($champ)) {
             $champ->removeChoisir($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, RenvoieSaisie>
+     */
+    public function getRenvoieSaisies(): Collection
+    {
+        return $this->renvoieSaisies;
+    }
+
+    public function addRenvoieSaisy(RenvoieSaisie $renvoieSaisy): self
+    {
+        if (!$this->renvoieSaisies->contains($renvoieSaisy)) {
+            $this->renvoieSaisies->add($renvoieSaisy);
+            $renvoieSaisy->setFomulaireId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRenvoieSaisy(RenvoieSaisie $renvoieSaisy): self
+    {
+        if ($this->renvoieSaisies->removeElement($renvoieSaisy)) {
+            // set the owning side to null (unless already changed)
+            if ($renvoieSaisy->getFomulaireId() === $this) {
+                $renvoieSaisy->setFomulaireId(null);
+            }
         }
 
         return $this;
