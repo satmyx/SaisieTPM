@@ -9,7 +9,33 @@
 	<div class="container mx-auto p-8">
 		{{ form_start(form) }}
 
+		{% set valeurStepper = 0 %}
+
+		<ul class="stepper" data-mdb-stepper="stepper">
+
+			{% for batch in form|slice(0, form|length - 2)|batch(4) %}
+
+				{% set valeurStepper = valeurStepper + 1 %}
+
+				<li class="stepper-step">
+					<div class="stepper-head">
+						<span class="stepper-head-icon">
+							{{valeurStepper}}
+						</span>
+					</div>
+					<div class="stepper-content">
+						{% for option in batch %}
+							{{form_row(option)}}
+						{% endfor %}
+					</div>
+				</li>
+
+			{% endfor %}
+
+		</ul>
+
 		{{ form_rest(form) }}
+
 		{{ form_end(form) }}
 	</div>
 {% endblock %}
