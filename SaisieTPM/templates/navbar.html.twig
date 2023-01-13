@@ -21,10 +21,13 @@
 						{{app.user.username}}
 						<ul class="dropdown-menu min-w-max absolute hidden bg-white text-base z-50 float-left py-2 list-none text-left rounded-lg shadow-lg mt-1 hidden m-0 bg-clip-padding border-none left-auto right-0 bg-gray-800" aria-labelledby="dropdownMenuButton1">
 							<li>
-								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-green-700 hover:bg-green-100" href="/creationformulaire">Créer un formulaire</a>
+								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-green-700 hover:bg-green-100" href="/nomformulaire">Créer un formulaire</a>
 							</li>
 							<li>
-								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-amber-500 hover:bg-orange-100" id="btnMesForm" href="/creationformulaire">Mes formulaires</a>
+								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-amber-500 hover:bg-orange-100" href="/creationchamps">Gérer mes champs</a>
+							</li>
+							<li>
+								<a class="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-red-700 hover:bg-orange-100" href="/creationformulaire">Gérer mes formulaires</a>
 							</li>
 							{% if is_granted('ROLE_ADMIN') %}
 								<li>

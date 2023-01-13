@@ -2,28 +2,18 @@
 
 namespace App\Form;
 
-use App\Entity\Champs;
 use App\Entity\Formulaire;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
-class FormulaireType extends AbstractType
+class CreationFormulaireType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom', EntityType::class, array(
-                'class' => Formulaire::class,
-            ))
-            ->add('champs', EntityType::class, array(
-                'class' => Champs::class,
-                'multiple' => true,
-                'expanded' => true,
-                'by_reference' => false,
-            ))
+            ->add('nom')
             ->add('Enregistrer', SubmitType::class);
     }
 
