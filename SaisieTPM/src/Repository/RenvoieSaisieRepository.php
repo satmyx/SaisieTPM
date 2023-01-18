@@ -41,7 +41,7 @@ class RenvoieSaisieRepository extends ServiceEntityRepository
 
     public function getInfosRenvoie(ManagerRegistry $doctrine, $id) {
         $manager = $doctrine->getManager();
-        $sql = "SELECT user.username, formulaire.nom, renvoie_saisie.saisie 
+        $sql = "SELECT user.username, formulaire.nom, renvoie_saisie.saisie, renvoie_saisie.piecejointe 
         FROM renvoie_saisie
         INNER JOIN user
         ON user.id = renvoie_saisie.user_id_id

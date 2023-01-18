@@ -22,6 +22,9 @@ class RenvoieSaisie
     #[ORM\ManyToOne(inversedBy: 'renvoieSaisies')]
     private ?User $user_id = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $piecejointe = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class RenvoieSaisie
     public function setUserId(?User $user_id): self
     {
         $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    public function getPiecejointe(): ?string
+    {
+        return $this->piecejointe;
+    }
+
+    public function setPiecejointe(?string $piecejointe): self
+    {
+        $this->piecejointe = $piecejointe;
 
         return $this;
     }
