@@ -25,6 +25,10 @@ class Champs
     #[ORM\ManyToMany(targetEntity: Formulaire::class, inversedBy: 'champs')]
     private Collection $choisir;
 
+    #[ORM\ManyToOne(inversedBy: 'champs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $utilisateur = null;
+
     public function __construct()
     {
         $this->choisir = new ArrayCollection();
@@ -85,5 +89,17 @@ class Champs
 
     public function __toString() {
         return $this->nom;
+    }
+
+    public function getUtilisateur(): ?User
+    {
+        return $this->utilisateur;
+    }
+
+    public function setUtilisateur(?User $utilisateur): self
+    {
+        $this->utilisateur = $utilisateur;
+
+        return $this;
     }
 }

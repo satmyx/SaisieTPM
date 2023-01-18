@@ -22,67 +22,76 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RenvoieSaisieController extends AbstractController
 {
-    #[Route('/renvoiesaisie', name: 'app_renvoie_saisie')]
-    public function index(ManagerRegistry  $doctrine, EntityManagerInterface $manager, Request $request): Response
+    #[Route('/renvoiesaisie/{id}', name: 'app_renvoie_saisie', requirements: ["id" => "\d+"])]
+    public function index(ManagerRegistry  $doctrine, EntityManagerInterface $manager, Request $request, int $id): Response
     {
 
-        $idFormulaire = 9;
+        $leFormulaire = $doctrine->getRepository(Formulaire::class)->find($id);
 
-        $leFormulaire = $doctrine->getRepository(Formulaire::class)->find($idFormulaire);
-
-        $arrFormulaire = $doctrine->getRepository(Champs::class)->getInfoFormulaire($doctrine, $idFormulaire);
+        $arrFormulaire = $doctrine->getRepository(Champs::class)->getInfoFormulaire($doctrine, $id);
 
         $renvoieSaisie = new RenvoieSaisie();
 
         $formbuilder = $this->createFormBuilder();
 
-        foreach($arrFormulaire as $row => $value) {
-            $nomautoriser = preg_replace('/[^a-zA-Z0-9\']/', '_', $value['nom']);
+        $motInterdit = array(
+            'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Ç' => 'C', 'È' => 'E', 'É' => 'E',
+            'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ù' => 'U',
+            'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ý' => 'Y', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'a', 'ç' => 'c',
+            'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ð' => 'o', 'ñ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o',
+            'ö' => 'o', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ý' => 'y', 'ÿ' => 'y'
+        );
+
+        foreach ($arrFormulaire as $row => $value) {
+            $nomautoriser = strtr($value['nom'], $motInterdit);
+            $nomautoriser = preg_replace('/[^a-zA-Z0-9\']/', '_', $nomautoriser);
             $nomautoriser = str_replace("'", '_', $nomautoriser);
             switch ($value['typage']) {
                 case 'TextType::class':
                     $formbuilder->add($nomautoriser, TextType::class, [
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
                 case 'TextareaType::class':
                     $formbuilder->add($nomautoriser, TextareaType::class, [
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
                 case 'EmailType::class':
                     $formbuilder->add($nomautoriser, EmailType::class, [
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
                 case 'NumberType::class':
                     $formbuilder->add($nomautoriser, NumberType::class, [
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
                 case 'DateType::class':
                     $formbuilder->add($nomautoriser, DateType::class, [
                         'widget' => 'single_text',
+                        'input' => 'string',
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
-                case 'DateType::classfin':
-                    $formbuilder->add($nomautoriser, DateType::class, [
-                        'widget' => 'single_text',
-                        'by_reference' => false,
-                    ]);
-                break;
+                    break;
                 case 'TimeType::class':
                     $formbuilder->add($nomautoriser, TimeType::class, [
                         'widget' => 'single_text',
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
                 case 'FileType::class':
                     $formbuilder->add($nomautoriser, FileType::class, [
                         'by_reference' => false,
+                        'label' => $value['nom'],
                     ]);
-                break;
+                    break;
             }
         }
         $formbuilder->add('Envoyer', SubmitType::class);
@@ -91,27 +100,27 @@ class RenvoieSaisieController extends AbstractController
 
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid()){
-            
+        if ($form->isSubmitted() && $form->isValid()) {
+
             $user = $this->getUser();
 
             $renvoieSaisie->setUserId($user);
 
             $renvoieSaisie->setFomulaireId($leFormulaire);
 
-            $renvoieSaisie->setSaisie(array($form->getData()));
+            $renvoieSaisie->setSaisie($form->getData());
 
             $manager->persist($renvoieSaisie);
 
             $manager->flush();
 
             return $this->redirectToRoute("app_accueil");
-
         }
 
         return $this->render('renvoie_saisie/index.html.twig', [
             'form' => $form->createview(),
             'arrform' => $arrFormulaire,
+            'id' => $id,
         ]);
     }
 }

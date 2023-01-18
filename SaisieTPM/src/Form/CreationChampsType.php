@@ -18,6 +18,7 @@ class CreationChampsType extends AbstractType
             ->add('nom')
             ->add('id_type', EntityType::class, array(
                 'class' => TypeChamps::class,
+                'label' => "Type de saisie",
             ))
             ->add('Enregistrer', SubmitType::class)
         ;

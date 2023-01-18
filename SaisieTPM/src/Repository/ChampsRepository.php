@@ -55,7 +55,17 @@ class ChampsRepository extends ServiceEntityRepository
         ON formulaire.id = champs_formulaire.formulaire_id
         WHERE formulaire.id  = :id";
         $statement = $manager->getConnection()->prepare($sql);
-        $result=$statement->executeQuery(['id' => $id]);
+        $result = $statement->executeQuery(['id' => $id]);
+        return $result->fetchAll();
+    }
+
+    public function getCountChampsByUser(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "SELECT count(*) as nbChamps
+        FROM champs
+        WHERE champs.utilisateur_id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery(['id' => $id]);
         return $result->fetchAll();
     }
 //    /**

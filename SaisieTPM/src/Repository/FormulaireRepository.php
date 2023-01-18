@@ -39,6 +39,15 @@ class FormulaireRepository extends ServiceEntityRepository
         }
     }
 
+    public function getCountFormulaireByUser(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "SELECT count(*) as nbForm
+        FROM formulaire
+        WHERE formulaire.relation_id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery(['id' => $id]);
+        return $result->fetchAll();
+    }
 //    /**
 //     * @return Formulaire[] Returns an array of Formulaire objects
 //     */

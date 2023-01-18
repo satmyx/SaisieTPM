@@ -26,13 +26,11 @@ class CreationChampsController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()) {
 
-            $creationChamps->setRelation($user);
+            $creationChamps->setUtilisateur($user);
 
-            $manager->persist($creationForm);
+            $manager->persist($creationChamps);
 
             $manager->flush();
-
-            return $this->redirectToRoute("app_creation_formulaire");
         }
 
         return $this->render('creation_champs/index.html.twig', [

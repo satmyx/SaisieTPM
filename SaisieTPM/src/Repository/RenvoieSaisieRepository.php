@@ -39,6 +39,34 @@ class RenvoieSaisieRepository extends ServiceEntityRepository
         }
     }
 
+    public function getInfosRenvoie(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "SELECT user.username, formulaire.nom, renvoie_saisie.saisie 
+        FROM renvoie_saisie
+        INNER JOIN user
+        ON user.id = renvoie_saisie.user_id_id
+        INNER JOIN formulaire
+        ON formulaire.id = renvoie_saisie.fomulaire_id_id
+        WHERE formulaire.relation_id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery(['id' => $id]);
+        return $result->fetchAll();
+    }
+
+    public function getNbRenvoie(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "SELECT count(*) as nbRenvoie
+        FROM renvoie_saisie
+        INNER JOIN formulaire
+        ON renvoie_saisie.fomulaire_id_id = formulaire.id
+        INNER JOIN user
+        ON user.id = formulaire.relation_id
+        WHERE user.id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $result = $statement->executeQuery(['id' => $id]);
+        return $result->fetchAll();
+    }
+
 //    /**
 //     * @return RenvoieSaisie[] Returns an array of RenvoieSaisie objects
 //     */

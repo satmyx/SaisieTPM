@@ -25,8 +25,11 @@ class CreationFormulaireController extends AbstractController
         $user = $this->getUser();
 
         if($form->isSubmitted() && $form->isValid()) {
+
             $creationForm->setRelation($user);
+
             $manager->persist($creationForm);
+            
             $manager->flush();
         }
 

@@ -36,10 +36,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: RenvoieSaisie::class)]
     private Collection $renvoieSaisies;
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Champs::class, orphanRemoval: true)]
+    private Collection $champs;
+
     public function __construct()
     {
         $this->formulaires = new ArrayCollection();
         $this->renvoieSaisies = new ArrayCollection();
+        $this->champs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -170,6 +174,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($renvoieSaisy->getUserId() === $this) {
                 $renvoieSaisy->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Champs>
+     */
+    public function getChamps(): Collection
+    {
+        return $this->champs;
+    }
+
+    public function addChamp(Champs $champ): self
+    {
+        if (!$this->champs->contains($champ)) {
+            $this->champs->add($champ);
+            $champ->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChamp(Champs $champ): self
+    {
+        if ($this->champs->removeElement($champ)) {
+            // set the owning side to null (unless already changed)
+            if ($champ->getUtilisateur() === $this) {
+                $champ->setUtilisateur(null);
             }
         }
 
