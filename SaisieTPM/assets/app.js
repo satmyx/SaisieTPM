@@ -37,21 +37,10 @@ class App {
      */
     btnPanelAdmin
 
-    /**
-     * @type {HTMLButtonElement}
-     */
-    btnConnexion
-
-    /**
-     * @type {HTMLButtonElement}
-     */
-    btnFormEnvoyer
-
     constructor() {
         this.btnDeconnexion = document.querySelector("#btnDeconnexion");
         this.btnMesForm = document.querySelector("#btnMesForm");
         this.btnPanelAdmin = document.querySelector("#btnPanelAdmin");
-        this.btnFormEnvoyer = document.querySelector("#form_Envoyer");
 
         if(this.btnDeconnexion) {
             this.btnDeconnexion.addEventListener('click', async () => {
@@ -70,12 +59,7 @@ class App {
                 await this.MessagePanelAdmin();
             })
         }
-
-        if (this.btnFormEnvoyer) {
-            this.btnFormEnvoyer.addEventListener('click', async() => {
-                await this.MessageFormEnvoyer();
-            })
-        }
+        
     }
 
     async MessageDeconnexion() {
@@ -120,21 +104,6 @@ class App {
         Toast.fire({
             icon: 'success',
             title: "Bienvenue sur le panel d'administration"
-        })
-    }
-
-    async MessageFormEnvoyer() {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-        })
-
-        Toast.fire({
-            icon: 'success',
-            title: "Votre saisie a bien été envoyé"
         })
     }
 }

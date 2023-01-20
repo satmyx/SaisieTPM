@@ -32,6 +32,8 @@ class CreationFormulaireController extends AbstractController
             
             $manager->flush();
 
+            sweetalert()->toast(true, 'top-end', false)->addSuccess('Votre formulaire : '. $creationForm->getNom(). ' a bien été enregistré');
+
             return $this->redirectToRoute("app_accueil");
         }
 

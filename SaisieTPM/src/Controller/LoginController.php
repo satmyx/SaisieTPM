@@ -14,6 +14,10 @@ class LoginController extends AbstractController
     {
         // Prend derniere erreur d'auth
         $error = $authenticationUtils->getLastAuthenticationError();
+
+        if ($error) {
+            sweetalert()->toast(true, 'top-end', false)->addError('Identifiants incorrect');
+        }
         
         // Dernier username entrer par l'utilisateur
         $lastUsername = $authenticationUtils->getLastUsername();

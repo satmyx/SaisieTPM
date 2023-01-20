@@ -31,6 +31,8 @@ class CreationChampsController extends AbstractController
             $manager->persist($creationChamps);
 
             $manager->flush();
+
+            sweetalert()->toast(true, 'top-end', false)->addSuccess('Votre champ : '. $creationChamps->getNom(). ' a bien été enregistré');
         }
 
         return $this->render('creation_champs/index.html.twig', [
