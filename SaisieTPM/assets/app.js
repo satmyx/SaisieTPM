@@ -51,18 +51,11 @@ class App {
         this.btnDeconnexion = document.querySelector("#btnDeconnexion");
         this.btnMesForm = document.querySelector("#btnMesForm");
         this.btnPanelAdmin = document.querySelector("#btnPanelAdmin");
-        this.btnConnexion = document.querySelector("#btnConnexion");
         this.btnFormEnvoyer = document.querySelector("#form_Envoyer");
 
         if(this.btnDeconnexion) {
             this.btnDeconnexion.addEventListener('click', async () => {
                 await this.MessageDeconnexion();
-            })
-        }
-
-        if(this.btnConnexion) {
-            this.btnConnexion.addEventListener('click', async () => {
-                await this.MessageConnexion();
             })
         }
 
@@ -99,22 +92,7 @@ class App {
             title: 'Déconnexion effectuée avec succès'
         })
     }
-
-    async MessageConnexion() {
-        const Toast = Swal.mixin({
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: false,
-        })
-
-        Toast.fire({
-            icon: 'success',
-            title: 'Connexion effectuée avec succès'
-        })
-    }
-
+    
     async MessageMesForm() {
         const Toast = Swal.mixin({
             toast: true,

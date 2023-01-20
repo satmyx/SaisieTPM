@@ -31,6 +31,8 @@ class CreationFormulaireController extends AbstractController
             $manager->persist($creationForm);
             
             $manager->flush();
+
+            return $this->redirectToRoute("app_accueil");
         }
 
         return $this->render('creation_formulaire/index.html.twig', [
