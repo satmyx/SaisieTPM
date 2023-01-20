@@ -18,7 +18,7 @@
 								</svg>
 							</div>
 							<div class="ml-3">
-								<p class="text-gray-500 mb-0.5">Formulaires</p>
+								<p class="text-gray-500 mb-0.5">FORMULAIRES</p>
 								<p class="mb-0 flex justify-start">
 									<span class="text-xl font-semibold mr-3">{{nbFormulaire[0].nbForm}}</span>
 								</p>
@@ -35,7 +35,7 @@
 								</svg>
 							</div>
 							<div class="ml-3">
-								<p class="text-gray-500 mb-0.5">Réponses</p>
+								<p class="text-gray-500 mb-0.5">RÉPONSES</p>
 								<p class="mb-0 flex justify-start">
 									<span class="text-xl font-semibold mr-3">{{nbRenvoie[0].nbRenvoie}}</span>
 								</p>
@@ -52,7 +52,7 @@
 								</svg>
 							</div>
 							<div class="ml-3">
-								<p class="text-gray-500 mb-0.5">Champs</p>
+								<p class="text-gray-500 mb-0.5">CHAMPS</p>
 								<p class="mb-0 flex justify-start">
 									<span class="text-xl font-semibold mr-3">{{nbChamps[0].nbChamps}}</span>
 								</p>
@@ -76,13 +76,13 @@
 										</svg>
 									</th>
 									<th scope="col" class="text-sm font-medium text-white px-6 py-4 text-left">
-										Utilisateur
+										UTILISATEUR
 									</th>
 									<th scope="col" class="text-sm font-medium text-white px-6 py-4 text-left">
-										Formulaire
+										FORMULAIRE
 									</th>
 									<th scope="col" class="text-sm font-medium text-white px-6 py-4 text-left">
-										Réponse
+										RÉPONSE
 									</th>
 								</tr>
 							</thead>
@@ -122,7 +122,7 @@
 												<div class="modal-body relative p-4">
 													{% for informationsSaisieKeys in informations.0|keys %}
 														<br>
-														<h4 class="font-medium leading-tight text-2xl text-center mt-0 mb-2 text-blue-600">{{informationsSaisieKeys|replace({'_': ' '})}}</h4>
+														<h4 class="font-medium leading-tight text-2xl text-center mt-0 mb-2 text-blue-600">{{informationsSaisieKeys|upper|replace({'_': ' '})}}</h4>
 														<br>
 														<p class="text-center">{{ informations.0[informationsSaisieKeys] }}</p>
 														<br>
