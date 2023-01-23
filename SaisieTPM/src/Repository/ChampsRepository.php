@@ -68,6 +68,15 @@ class ChampsRepository extends ServiceEntityRepository
         $result = $statement->executeQuery(['id' => $id]);
         return $result->fetchAll();
     }
+
+    public function deleteChampsById(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "DELETE champs
+        FROM champs
+        WHERE champs.id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $statement->executeQuery(['id' => $id]);
+    }
 //    /**
 //     * @return Champs[] Returns an array of Champs objects
 //     */

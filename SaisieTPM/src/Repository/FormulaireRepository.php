@@ -48,6 +48,19 @@ class FormulaireRepository extends ServiceEntityRepository
         $result = $statement->executeQuery(['id' => $id]);
         return $result->fetchAll();
     }
+
+    public function deleteAllDataFormById(ManagerRegistry $doctrine, $id, $iduser) {
+        $manager = $doctrine->getManager();
+        $sql = "DELETE champs_formulaire, champs, formulaire
+        FROM formulaire
+        INNER JOIN champs_formulaire
+        ON champs_formulaire.formulaire_id = formulaire.id
+        INNER JOIN champs
+        ON champs_formulaire.champs_id = champs.id
+        WHERE formulaire.id = :id AND formulaire.relation_id = :iduser";
+        $statement = $manager->getConnection()->prepare($sql);
+        $statement->executeQuery(['id' => $id, 'iduser' => $iduser]);
+    }
 //    /**
 //     * @return Formulaire[] Returns an array of Formulaire objects
 //     */

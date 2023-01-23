@@ -67,6 +67,15 @@ class RenvoieSaisieRepository extends ServiceEntityRepository
         return $result->fetchAll();
     }
 
+    public function deleteByIdForm(ManagerRegistry $doctrine, $id) {
+        $manager = $doctrine->getManager();
+        $sql = "DELETE renvoie_saisie
+        FROM renvoie_saisie
+        WHERE renvoie_saisie.fomulaire_id_id = :id";
+        $statement = $manager->getConnection()->prepare($sql);
+        $statement->executeQuery(['id' => $id]);
+    }
+
 //    /**
 //     * @return RenvoieSaisie[] Returns an array of RenvoieSaisie objects
 //     */
