@@ -5,6 +5,18 @@ namespace App\Entity;
 use App\Repository\RenvoieSaisieRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+
+#[ApiResource]
+#[Get]
+#[Put(security: "is_granted('ROLE_ADMIN') or object.owner == user")]
+#[GetCollection]
+#[Post(security: "is_granted('ROLE_USER')")]
+
 #[ORM\Entity(repositoryClass: RenvoieSaisieRepository::class)]
 class RenvoieSaisie
 {
@@ -13,6 +25,7 @@ class RenvoieSaisie
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\Json]
     #[ORM\Column]
     private array $saisie = [];
 
