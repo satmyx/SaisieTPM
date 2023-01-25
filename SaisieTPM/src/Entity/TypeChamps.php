@@ -104,4 +104,8 @@ class TypeChamps
     public function __toString() {
         return $this->nom;
     }
+
+    public function getName() {
+        return $this->nom;
+    }
 }

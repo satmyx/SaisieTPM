@@ -109,6 +109,10 @@ class Champs
         return $this->utilisateur;
     }
 
+    public function getName() {
+        return $this->nom;
+    }
+
     public function setUtilisateur(?User $utilisateur): self
     {
         $this->utilisateur = $utilisateur;

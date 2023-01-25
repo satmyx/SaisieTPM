@@ -136,4 +136,8 @@ class Formulaire
     public function __toString() {
         return $this->nom;
     }
+
+    public function getName() {
+        return $this->nom;
+    }
 }
