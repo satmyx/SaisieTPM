@@ -9,6 +9,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: username
+        apikey_user_provider:
+            entity:
+                class: App\Entity\User
+                property: apiKey
     firewalls:
         secured_area:
             pattern: main
@@ -16,9 +20,12 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            custom_authenticators:
+                    - App\Security\ApiKeyAuthenticator
             lazy: true
-            provider: app_user_provider
+            provider: apikey_user_provider
             form_login:
+                provider: app_user_provider
                 # "app_login" is the name of the route created previously
                 login_path: app_login
                 check_path: app_login

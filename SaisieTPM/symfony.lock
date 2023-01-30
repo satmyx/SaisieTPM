@@ -57,18 +57,6 @@
             "ref": "b131e6cbfe1b898a508987851963fff485986285"
         }
     },
-    "eightpoints/guzzle-bundle": {
-        "version": "8.3",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "7.0",
-            "ref": "7babb21a3928e44e485391907e3abc346804e0d2"
-        },
-        "files": [
-            "./config/packages/eight_points_guzzle.yaml"
-        ]
-    },
     "nelmio/cors-bundle": {
         "version": "2.2",
         "recipe": {
@@ -86,6 +74,18 @@
     },
     "php-flasher/flasher-symfony": {
         "version": "v1.13.0"
+    },
+    "symfony/apache-pack": {
+        "version": "1.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "1.0",
+            "ref": "efb318193e48384eb5c5aadff15396ed698f8ffc"
+        },
+        "files": [
+            "./public/.htaccess"
+        ]
     },
     "symfony/console": {
         "version": "6.2",

@@ -2,18 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use App\Controller\MeController;
+use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Action\NotFoundAction;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 
 /**
@@ -23,11 +28,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Sécurisation des ressources par Roles
  */
-#[ApiResource]
-#[Get]
-#[Put(security: "is_granted('ROLE_ADMIN') or object.owner == user")]
-#[GetCollection]
-#[Post(security: "is_granted('ROLE_ADMIN')")]
+
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Renvoie la liste de toutes les entités"]),
+        new Post(security: "is_granted('ROLE_ADMIN')", openapiContext: ["summary" => "Permet de créer une entité (ROLE ADMIN)"]),
+        new Get(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Renvoie l'entité selon l'id"]),
+        new Patch(security: "is_granted('ROLE_ADMIN') or object.owner == user", openapiContext: ["summary" => "Modifie un élément de l'entité (ROLE ADMIN ou Propriétaire)"]),
+        new Delete(security: "is_granted('ROLE_ADMIN')", openapiContext: ["summary" => "Supprime l'entité (ROLE ADMIN)"]),
+    ],
+    normalizationContext: ['groups' => ['user:read']],
+    denormalizationContext: ['groups' => ['user:create', 'user:update']],
+)]
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -36,13 +48,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
     #[ORM\Column(length: 180, unique: true)]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
     private ?string $username = null;
 
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private array $roles = [];
 
     /**
@@ -59,6 +74,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Champs::class, orphanRemoval: true)]
     private Collection $champs;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['user:create', 'user:update'])]
+    private ?string $apiKey = null;
 
     public function __construct()
     {
@@ -233,5 +252,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getName() {
         return $this->getUsername();
+    }
+
+    public function getApiKey(): ?string
+    {
+        return $this->apiKey;
+    }
+
+    public function setApiKey(?string $apiKey): self
+    {
+        $this->apiKey = $apiKey;
+
+        return $this;
     }
 }
