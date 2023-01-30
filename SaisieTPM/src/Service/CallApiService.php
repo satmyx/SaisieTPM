@@ -17,7 +17,7 @@ class CallApiService
     public function getTypeChamps($token) {
         $response = $this->client->request(
             'GET',
-            'http://saisie/api/champs', [
+            'http://saisie/api/type_champs', [
                 'headers' => ['Authorization' => 'Bearer '. $token],
             ]
         );
@@ -30,7 +30,7 @@ class CallApiService
 
         $nom = $data['creation_champs']['nom'];
 
-        $type = '/api/type_champs/'. $data['creation_champs']['id_type'];
+        $type = $data['creation_champs']['id_type'];
 
         $utilisateur = '/api/users/'. $user->getId();
 

@@ -30,7 +30,9 @@ class CreationChampsType extends AbstractType
     {
         $typeDeChamps = array();
 
-        foreach($this->api->getTypeChamps($this->token->getToken()->getUser()->getApiKey())['hydra:member'] as $value){
+        $user = $this->token->getToken()->getUser();
+
+        foreach($this->api->getTypeChamps($user->getApiKey(), $this->token->getToken()->getUser())['hydra:member'] as $value) {
             $typeDeChamps[$value['nom']] = $value['@id'];
         }
 
@@ -40,14 +42,6 @@ class CreationChampsType extends AbstractType
                 'choices' => $typeDeChamps,
                 'label' => "Type de saisie",
             ))
-            ->add('Enregistrer', SubmitType::class)
-        ;
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Champs::class,
-        ]);
+            ->add('Enregistrer', SubmitType::class);
     }
 }
