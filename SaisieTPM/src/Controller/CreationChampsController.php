@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Champs;
 use App\Service\CallApiService;
 use App\Form\CreationChampsType;
-use Doctrine\ORM\EntityManagerInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +20,7 @@ class CreationChampsController extends AbstractController
 {
 
     #[Route('/creationchamps', name: 'app_creation_champs')]
-    public function index(EntityManagerInterface $manager, Request $request, CallApiService $api): Response
+    public function index(Request $request, CallApiService $api): Response
     {
         $form = $this->createForm(CreationChampsType::class);
 

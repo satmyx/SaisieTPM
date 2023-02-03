@@ -2,38 +2,42 @@
 
 namespace App\Controller;
 
-use App\Entity\Champs;
-use App\Entity\Formulaire;
-use App\Entity\RenvoieSaisie;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Service\CallApiService;
+
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class StatsController extends AbstractController
 {
     #[Route('/stats', name: 'app_stats')]
-    public function index(ManagerRegistry  $doctrine, Request $request, EntityManagerInterface $manager): Response
+    public function index(Request $request, CallApiService $api): Response
     {
 
-        $idUtilisateur = $this->getUser()->getId();
+        $user = $this->getUser();
 
-        $recupInfoSaisie = $doctrine->getRepository(RenvoieSaisie::class)->getInfosRenvoie($doctrine, $idUtilisateur);
+        $idUtilisateur = $user->getId();
 
-        $recupInfosNbForm = $doctrine->getRepository(Formulaire::class)->getCountFormulaireByUser($doctrine, $idUtilisateur);
+        $recupInfoSaisie = $api->getRenvoieSaisieByForm($user->getApiKey(), $user->getId());
 
-        $recupInfosNbChamps = $doctrine->getRepository(Champs::class)->getCountChampsByUser($doctrine, $idUtilisateur);
+        $recupInfosNbForm = $api->getCptForms($user->getApiKey(), $user->getId());
 
-        $recupInfosNbRenvoie = $doctrine->getRepository(RenvoieSaisie::class)->getNbRenvoie($doctrine, $idUtilisateur);
+        $recupInfosNbChamps = $api->getCptChamps($user->getApiKey(), $user->getId());
+
+        $recupInfosNbRenvoie = $api->getCptRenvoieSaisie($user->getApiKey(), $user->getId());
+
+        $recupDelete = $api->getFormByUser($user->getApiKey(), $user->getId());
 
         $formbuilder = $this->createFormBuilder();
 
-        $formbuilder->add('ChoixFormulaire', EntityType::class, array(
-            'class' => Formulaire::class,
+        $formbuilder->add('ChoixFormulaire', ChoiceType::class, array(
+            'choices' => $recupDelete,
         ));
 
         $formbuilder->add('Supprimer', SubmitType::class);
@@ -44,17 +48,23 @@ class StatsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) { 
 
-            $idFormulaire = $form['ChoixFormulaire']->getData()->getId();
+            $data = $request->request->all();
 
-            $doctrine->getRepository(RenvoieSaisie::class)->deleteByIdForm($doctrine, $idFormulaire);
+            $listeRenvoie = $api->getByUri($user->getApiKey(), $data['form']['ChoixFormulaire']);
 
-            $doctrine->getRepository(Formulaire::class)->deleteAllDataFormById($doctrine, $idFormulaire, $idUtilisateur);
-            
-            $manager->flush();
-        }
-        
-        foreach ($recupInfoSaisie as $key => $value) {
-            array_push($recupInfoSaisie[$key], json_decode($value['saisie'], true));
+            foreach ($listeRenvoie['renvoieSaisies'] as $value) {
+                $api->deleteRessource($user->getApiKey(), $value);
+            }
+
+            foreach ($listeRenvoie['champs'] as $value) {
+                $api->deleteRessource($user->getApiKey(), $value);
+            }
+
+            $api->deleteRessource($user->getApiKey(), $data['form']['ChoixFormulaire']);
+
+            sweetalert()->toast(true, 'top-end', false)->addSuccess('Supression effectuée avec succès');
+
+            return $this->redirectToRoute("app_stats");
         }
 
         return $this->render('stats/index.html.twig', [

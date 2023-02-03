@@ -2,10 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Champs;
-use App\Entity\Formulaire;
 use App\Form\FormulaireType;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\CallApiService;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,11 +13,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class CreationFormulaireController extends AbstractController
 {
     #[Route('/creationformulaire', name: 'app_creation_formulaire')]
-    public function index(EntityManagerInterface $manager, Request $request): Response
+    public function index(Request $request, CallApiService $api): Response
     {
-        $creationForm = new Formulaire();
-
-        $form = $this->createForm(FormulaireType::class, $creationForm);
+        $form = $this->createForm(FormulaireType::class);
 
         $form->handleRequest($request);
 
@@ -26,13 +23,11 @@ class CreationFormulaireController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()) {
 
-            $creationForm->setRelation($user);
+            $data = $request->request->all();
 
-            $manager->persist($creationForm);
-            
-            $manager->flush();
+            $api->setFormulaire($user->getApiKey(), $data, $user);
 
-            sweetalert()->toast(true, 'top-end', false)->addSuccess('Votre formulaire : '. $creationForm->getNom(). ' a bien été enregistré');
+            sweetalert()->toast(true, 'top-end', false)->addSuccess('Votre formulaire : '. $data['formulaire']['nom']. ' a bien été enregistré');
 
             return $this->redirectToRoute("app_accueil");
         }

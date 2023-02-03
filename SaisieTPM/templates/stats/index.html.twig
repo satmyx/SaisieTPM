@@ -22,7 +22,7 @@
 							<div class="ml-3">
 								<p class="text-gray-500 mb-0.5">FORMULAIRES</p>
 								<p class="mb-0 flex justify-start">
-									<span class="text-xl font-semibold mr-3">{{nbFormulaire[0].nbForm}}</span>
+									<span class="text-xl font-semibold mr-3">{{nbFormulaire}}</span>
 								</p>
 							</div>
 						</div>
@@ -39,7 +39,7 @@
 							<div class="ml-3">
 								<p class="text-gray-500 mb-0.5">RÉPONSES</p>
 								<p class="mb-0 flex justify-start">
-									<span class="text-xl font-semibold mr-3">{{nbRenvoie[0].nbRenvoie}}</span>
+									<span class="text-xl font-semibold mr-3">{{nbRenvoie}}</span>
 								</p>
 							</div>
 						</div>
@@ -56,7 +56,7 @@
 							<div class="ml-3">
 								<p class="text-gray-500 mb-0.5">CHAMPS</p>
 								<p class="mb-0 flex justify-start">
-									<span class="text-xl font-semibold mr-3">{{nbChamps[0].nbChamps}}</span>
+									<span class="text-xl font-semibold mr-3">{{nbChamps}}</span>
 								</p>
 							</div>
 						</div>
@@ -109,7 +109,7 @@
 											{{informations.username}}
 										</td>
 										<td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
-											{{informations.nom}}
+											{{informations.formulaire}}
 										</td>
 										<td class="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
 											<button type="button" class="inline-block px-6 py-2.5 bg-blue-900 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out" data-bs-toggle="modal" data-bs-target="#A{{valeurUnique}}">
@@ -131,11 +131,11 @@
 													<button type="button" class="btn-close box-content w-4 h-4 p-1 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="modal" aria-label="Close"></button>
 												</div>
 												<div class="modal-body relative p-4">
-													{% for informationsSaisieKeys in informations.0|keys %}
+													{% for informationsSaisieKeys in informations.saisie|keys %}
 														<br>
 														<h4 class="font-medium leading-tight text-2xl text-center mt-0 mb-2 text-blue-600">{{informationsSaisieKeys|upper|replace({'_': ' '})}}</h4>
 														<br>
-														<p class="text-center">{{ informations.0[informationsSaisieKeys] }}</p>
+														<p class="text-center">{{ informations.saisie[informationsSaisieKeys] }}</p>
 														<br>
 													{% endfor %}
 													{% if informations.piecejointe %}

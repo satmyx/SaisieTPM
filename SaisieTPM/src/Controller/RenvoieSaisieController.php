@@ -2,16 +2,16 @@
 
 namespace App\Controller;
 
-use App\Entity\Champs;
-use App\Entity\Formulaire;
-use App\Entity\RenvoieSaisie;
 use App\Service\FileUploader;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Service\CallApiService;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\HttpFoundation\File\File;
+
 use Symfony\Component\Routing\Annotation\Route;
+
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -20,19 +20,19 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class RenvoieSaisieController extends AbstractController
 {
     #[Route('/renvoiesaisie/{id}', name: 'app_renvoie_saisie', requirements: ["id" => "\d+"])]
-    public function index(ManagerRegistry  $doctrine, EntityManagerInterface $manager, Request $request, FileUploader $fileUploader, int $id): Response
+    public function index(Request $request, FileUploader $fileUploader, CallApiService $api, int $id): Response
     {
+        $token = $this->getUser()->getApiKey();
 
-        $leFormulaire = $doctrine->getRepository(Formulaire::class)->find($id);
+        $leFormulaire = $api->getFormById($token, $id);
 
-        $arrFormulaire = $doctrine->getRepository(Champs::class)->getInfoFormulaire($doctrine, $id);
-
-        $renvoieSaisie = new RenvoieSaisie();
+        $arrFormulaire = $api->getFormChampsByUriAndType($token, $id);
 
         $formbuilder = $this->createFormBuilder();
 
@@ -44,34 +44,34 @@ class RenvoieSaisieController extends AbstractController
             'ö' => 'o', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ý' => 'y', 'ÿ' => 'y'
         );
 
-        foreach ($arrFormulaire as $row => $value) {
-            $nomautoriser = strtr($value['nom'], $motInterdit);
+        foreach ($arrFormulaire as $key => $value) {
+            $nomautoriser = strtr($key, $motInterdit);
             $nomautoriser = preg_replace('/[^a-zA-Z0-9\']/', '_', $nomautoriser);
             $nomautoriser = str_replace("'", '_', $nomautoriser);
             $pieceJointe = false;
-            switch ($value['typage']) {
+            switch ($value) {
                 case 'TextType::class':
                     $formbuilder->add($nomautoriser, TextType::class, [
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'TextareaType::class':
                     $formbuilder->add($nomautoriser, TextareaType::class, [
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'EmailType::class':
                     $formbuilder->add($nomautoriser, EmailType::class, [
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'NumberType::class':
                     $formbuilder->add($nomautoriser, NumberType::class, [
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'DateType::class':
@@ -79,7 +79,7 @@ class RenvoieSaisieController extends AbstractController
                         'widget' => 'single_text',
                         'input' => 'string',
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'TimeType::class':
@@ -87,14 +87,14 @@ class RenvoieSaisieController extends AbstractController
                         'widget' => 'single_text',
                         'by_reference' => false,
                         'input' => 'string', 
-                        'label' => $value['nom'],
+                        'label' => $key,
                     ]);
                     break;
                 case 'FileType::class':
                     $pieceJointe = true;
                     $formbuilder->add('piecejointe', FileType::class, [
                         'by_reference' => false,
-                        'label' => $value['nom'],
+                        'label' => $key,
                         'mapped' => false,
                         'required' => false,
                     ]);
@@ -111,29 +111,27 @@ class RenvoieSaisieController extends AbstractController
 
             $user = $this->getUser();
 
-            $renvoieSaisie->setUserId($user);
+            $data = $request->request->all();
 
-            $renvoieSaisie->setFomulaireId($leFormulaire);
+            array_pop($data['form']);
+            array_pop($data['form']);
 
-            $renvoieSaisie->setSaisie($form->getData());
+            $apiUser = '/api/users/'.$user->getId();
 
             if ($pieceJointe) {
                 $piecejointeFileName = $fileUploader->upload($form->get('piecejointe')->getData());
-                $renvoieSaisie->setPiecejointe($piecejointeFileName);
+                $api->setRenvoieSaisie($token, $apiUser, $data['form'], $leFormulaire['@id'], $piecejointeFileName);
             } else {
-                $renvoieSaisie->setPiecejointe(null);
+                $api->setRenvoieSaisie($token, $apiUser, $data['form'], $leFormulaire['@id'], null);
             }
 
-            $manager->persist($renvoieSaisie);
-
-            $manager->flush();
+            sweetalert()->toast(true, 'top-end', false)->addSuccess('Votre réponse a bien été enregistré');
 
             return $this->redirectToRoute("app_accueil");
         }
 
         return $this->render('renvoie_saisie/index.html.twig', [
             'form' => $form->createview(),
-            'arrform' => $arrFormulaire,
             'id' => $id,
         ]);
     }

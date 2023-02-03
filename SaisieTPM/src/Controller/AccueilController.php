@@ -2,9 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Champs;
-use App\Entity\Formulaire;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Service\CallApiService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,9 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AccueilController extends AbstractController
 {
     #[Route('/accueil', name: 'app_accueil')]
-    public function index(ManagerRegistry  $doctrine): Response
+    public function index(CallApiService $api): Response
     {
-        $listeForm = $doctrine->getRepository(Formulaire::class)->findAll($doctrine);
+        $token = $this->getUser()->getApiKey();
+        $listeForm = $api->getForm($token)['hydra:member'];
 
         return $this->render('accueil/index.html.twig', [
             'listeForm' => $listeForm,
