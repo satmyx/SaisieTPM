@@ -14,6 +14,9 @@ class CallApiService
         $this->client = $client;
     }
 
+    /**
+     * Permet de récupérer le type d'un champs.
+     */
     public function getTypeChamps($token) {
         $response = $this->client->request(
             'GET',
@@ -25,6 +28,9 @@ class CallApiService
         return $response->toArray();
     }
 
+    /**
+     * Permet de récupérer la liste des champs.
+     */
     public function getChamps($token) {
         $response = $this->client->request(
             'GET',
@@ -36,6 +42,9 @@ class CallApiService
         return $response->toArray();
     }
 
+    /**
+     * Permet de récupérer la liste des champs par utilisateur.
+     */
     public function getChampsByUser($token, $idUser) {
         $listeChamps = $this->getChamps($token);
 
@@ -49,6 +58,9 @@ class CallApiService
         return $champsUtilisateur;
     }
 
+    /**
+     * Compteur permettant de retourner le nombre de formulaire par utilisateur (Stats).
+     */
     public function getCptForms($token, $idUser) {
         $response = $this->client->request(
             'GET',
@@ -68,6 +80,9 @@ class CallApiService
         return $cptFormulaires;
     }
 
+    /**
+     * Renvoie les formulaires d'un utilisateur.
+     */
     public function getFormByUser($token, $idUser) {
         $response = $this->client->request(
             'GET',
@@ -87,6 +102,9 @@ class CallApiService
         return $listeForm;
     }
 
+    /**
+     * Supprime une ressource en BDD via un URI donner.
+     */
     public function deleteRessource($token, $uri) {
         $response = $this->client->request(
             'DELETE',
@@ -96,6 +114,9 @@ class CallApiService
         );
     }
 
+    /**
+     * Renvoie le nombre de champs par utilisateur (Stats).
+     */
     public function getCptChamps($token, $idUser) {
         $response = $this->client->request(
             'GET',
@@ -115,6 +136,9 @@ class CallApiService
         return $cptChamps;
     }
 
+    /**
+     * Renvoie le nombre de renvoie par formulaire selon l'utilisateur (Stats).
+     */
     public function getCptRenvoieSaisie($token, $idUser) {
         $response = $this->client->request(
             'GET',
@@ -150,17 +174,9 @@ class CallApiService
         return $cptRenvoieSaisie;
     }
 
-    public function getUsername($token, $uri) {
-        $username = $this->client->request(
-            'GET',
-            'http://saisie'.$uri, [
-                'headers' => ['Authorization' => 'Bearer '. $token],
-            ]
-        );
-
-        return $username;
-    }
-
+    /**
+     * Renvoie un formulaire selon son ID.
+     */
     public function getFormById($token, $id) {
         $formulaire = $this->client->request(
             'GET',
@@ -172,6 +188,9 @@ class CallApiService
         return $formulaire->toArray();
     }
 
+    /**
+     * Renvoie une ressource présente en BDD selon l'URI donner.
+     */
     public function getByUri($token, $uri) {
         $fetchUri = $this->client->request(
             'GET',
@@ -183,8 +202,9 @@ class CallApiService
         return $fetchUri->toArray();
     }
 
-
-
+    /**
+     * Retourne la liste des champs par formulaire ainsi que leurs types.
+     */
     public function getFormChampsByUriAndType($token, $id) {
 
         $formulaire = $this->getFormById($token, $id);
@@ -213,6 +233,9 @@ class CallApiService
         return $listeChamps;
     }
 
+    /**
+     * Renvoie la liste des formulaires.
+     */
     public function getForm($token) {
         $formulaire = $this->client->request(
             'GET',
@@ -224,6 +247,9 @@ class CallApiService
         return $formulaire->toArray();
     }
 
+    /**
+     * Renvoie toutes les saisies des formulaires.
+     */
     public function getRenvoieSaisie($token) {
         $renvoie = $this->client->request(
             'GET',
@@ -235,6 +261,9 @@ class CallApiService
         return $renvoie->toArray()['hydra:member'];
     }
 
+    /**
+     * Renvoie les saisies d'un formulaire précis.
+     */
     public function getRenvoieSaisieByForm($token, $idUser) {
         $response = $this->getRenvoieSaisie($token);
 
@@ -257,7 +286,7 @@ class CallApiService
         }
 
         foreach($listeSaisie as $value) {
-            $username = $this->getUsername($token, $value['user_id']);
+            $username = $this->getByUri($token, $value['user_id']);
 
             $nomForm = $this->client->request(
                 'GET',
@@ -267,9 +296,9 @@ class CallApiService
             );
 
             if(array_key_exists('piecejointe', $value)){
-                $listeSaisie[] = array_merge(['username' => $username->toArray()['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => $value['piecejointe']]);
+                $listeSaisie[] = array_merge(['username' => $username['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => $value['piecejointe']]);
             } else {
-                $listeSaisie[] = array_merge(['username' => $username->toArray()['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => null]);
+                $listeSaisie[] = array_merge(['username' => $username['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => null]);
             }
 
             array_shift($listeSaisie);
@@ -278,6 +307,9 @@ class CallApiService
         return $listeSaisie;
     }
 
+    /**
+     * Permet d'envoyer une saisie d'un formulaire.
+     */
     public function setRenvoieSaisie($token, $userId, $json, $formId, $piecejointe) {
         $response = $this->client->request(
             'POST',
@@ -293,6 +325,9 @@ class CallApiService
         );
     }
 
+    /**
+     * Permet de faire un formulaire avec l'attribution des champs.
+     */
     public function setFormulaire($token, array $data, UserInterface $user) {
 
         $nom = $data['formulaire']['nom'];
@@ -314,6 +349,9 @@ class CallApiService
         );
     }
 
+    /**
+     * Permet de faire la création d'un champs.
+     */
     public function setChampsData($token, array $data, UserInterface $user)
     {
 
