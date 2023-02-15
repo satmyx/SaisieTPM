@@ -14,6 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FormulaireRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
@@ -22,6 +25,15 @@ use Doctrine\Common\Collections\ArrayCollection;
         new Get(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Renvoie l'entité selon l'id"]),
         new Patch(security: "is_granted('ROLE_USER') or object.owner == user", openapiContext: ["summary" => "Modifie un élément de l'entité (ROLE ADMIN ou Propriétaire)"]),
         new Delete(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Supprime l'entité (ROLE ADMIN)"]),
+    ],
+    normalizationContext: ['groups' => ['formulaire:read']],
+    denormalizationContext: ['groups' => ['formulaire:create', 'formulaire:update']],
+)]
+
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'relation' => 'exact'
     ]
 )]
 
@@ -31,20 +43,25 @@ class Formulaire
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['formulaire:read','formulaire:create', 'formulaire:update'])]
     private ?int $id = null;
 
     #[Assert\NotBlank]
     #[ORM\Column(length: 255)]
+    #[Groups(['formulaire:read', 'renvoie_saisies:read','formulaire:create', 'formulaire:update'])]
     private ?string $nom = null;
 
     #[ORM\ManyToOne(inversedBy: 'formulaires')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['formulaire:read','formulaire:create', 'formulaire:update'])]
     private ?User $relation = null;
 
     #[ORM\ManyToMany(targetEntity: Champs::class, mappedBy: 'choisir')]
+    #[Groups(['formulaire:read','formulaire:create', 'formulaire:update'])]
     private Collection $champs;
 
     #[ORM\OneToMany(mappedBy: 'fomulaire_id', targetEntity: RenvoieSaisie::class)]
+    #[Groups(['formulaire:read','formulaire:create', 'formulaire:update'])]
     private Collection $renvoieSaisies;
 
     public function __construct()

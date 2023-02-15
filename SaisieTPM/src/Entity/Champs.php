@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\ChampsRepository;
@@ -22,6 +24,13 @@ use Doctrine\Common\Collections\ArrayCollection;
         new Get(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Renvoie l'entité selon l'id"]),
         new Patch(security: "is_granted('ROLE_USER') or object.owner == user", openapiContext: ["summary" => "Modifie un élément de l'entité (ROLE ADMIN ou Propriétaire)"]),
         new Delete(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Supprime l'entité (ROLE ADMIN)"]),
+    ]
+)]
+
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'utilisateur' => 'exact'
     ]
 )]
 

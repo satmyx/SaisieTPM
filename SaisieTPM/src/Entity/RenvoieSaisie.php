@@ -7,11 +7,15 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\GetCollection;
-
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\RenvoieSaisieRepository;
+
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
     operations: [
@@ -20,6 +24,15 @@ use App\Repository\RenvoieSaisieRepository;
         new Get(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Renvoie l'entité selon l'id"]),
         new Patch(security: "is_granted('ROLE_USER') or object.owner == user", openapiContext: ["summary" => "Modifie un élément de l'entité (ROLE ADMIN ou Propriétaire)"]),
         new Delete(security: "is_granted('ROLE_USER')", openapiContext: ["summary" => "Supprime l'entité (ROLE ADMIN)"]),
+    ],
+    normalizationContext: ['groups' => ['renvoie_saisies:read']],
+    denormalizationContext: ['groups' => ['renvoie_saisies:create', 'renvoie_saisies:update']],
+)]
+
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'fomulaire_id.relation' => 'exact'
     ]
 )]
 
@@ -29,19 +42,24 @@ class RenvoieSaisie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['renvoie_saisies:read'])]
     private ?int $id = null;
 
     #[Assert\Json]
     #[ORM\Column]
+    #[Groups(['renvoie_saisies:read', 'renvoie_saisies:create', 'renvoie_saisies:update'])]
     private array $saisie = [];
 
     #[ORM\ManyToOne(inversedBy: 'renvoieSaisies')]
+    #[Groups(['renvoie_saisies:read', 'renvoie_saisies:create', 'renvoie_saisies:update'])]
     private ?Formulaire $fomulaire_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'renvoieSaisies')]
+    #[Groups(['renvoie_saisies:read', 'renvoie_saisies:create', 'renvoie_saisies:update'])]
     private ?User $user_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['renvoie_saisies:read', 'renvoie_saisies:create', 'renvoie_saisies:update'])]
     private ?string $piecejointe = null;
 
     public function getId(): ?int

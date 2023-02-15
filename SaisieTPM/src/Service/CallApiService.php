@@ -64,18 +64,12 @@ class CallApiService
     public function getCptForms($token, $idUser) {
         $response = $this->client->request(
             'GET',
-            'http://saisie/api/formulaires', [
+            'http://saisie/api/formulaires?relation='.$idUser, [
                 'headers' => ['Authorization' => 'Bearer '. $token],
             ]
         );
 
-        $cptFormulaires = 0;
-        $listeReponse = $response->toArray()['hydra:member'];
-        foreach ($listeReponse as $value) {
-            if($value['relation'] == '/api/users/'.$idUser) {
-                $cptFormulaires++;
-            }
-        }
+        $cptFormulaires = $response->toArray()['hydra:totalItems'];
 
         return $cptFormulaires;
     }
@@ -86,20 +80,20 @@ class CallApiService
     public function getFormByUser($token, $idUser) {
         $response = $this->client->request(
             'GET',
-            'http://saisie/api/formulaires', [
+            'http://saisie/api/formulaires?relation='.$idUser, [
                 'headers' => ['Authorization' => 'Bearer '. $token],
             ]
         );
 
-        $listeReponse = $response->toArray()['hydra:member'];
-        $listeForm = [];
-        foreach ($listeReponse as $value) {
-            if($value['relation'] == '/api/users/'.$idUser) {
-                $listeForm[$value['nom']] = $value['@id'];
-            }
+        $listeFormByUser = [];
+
+        $listeForm = $response->toArray()['hydra:member'];
+
+        foreach ($listeForm as $key => $value) {
+            $listeFormByUser[$value['nom']] = $value['@id'];
         }
 
-        return $listeForm;
+        return $listeFormByUser;
     }
 
     /**
@@ -120,18 +114,12 @@ class CallApiService
     public function getCptChamps($token, $idUser) {
         $response = $this->client->request(
             'GET',
-            'http://saisie/api/champs', [
+            'http://saisie/api/champs?utilisateur='.$idUser, [
                 'headers' => ['Authorization' => 'Bearer '. $token],
             ]
         );
 
-        $cptChamps = 0;
-        $listeReponse = $response->toArray()['hydra:member'];
-        foreach ($listeReponse as $value) {
-            if($value['utilisateur'] == '/api/users/'.$idUser) {
-                $cptChamps++;
-            }
-        }
+        $cptChamps = $response->toArray()['hydra:totalItems'];
 
         return $cptChamps;
     }
@@ -142,36 +130,14 @@ class CallApiService
     public function getCptRenvoieSaisie($token, $idUser) {
         $response = $this->client->request(
             'GET',
-            'http://saisie/api/renvoie_saisies', [
+            'http://saisie/api/renvoie_saisies?fomulaire_id.relation='.$idUser, [
                 'headers' => ['Authorization' => 'Bearer '. $token],
             ]
         );
 
-        $formulaire = $this->client->request(
-            'GET',
-            'http://saisie/api/formulaires', [
-                'headers' => ['Authorization' => 'Bearer '. $token],
-            ]
-        );
+        $countRenvoie = $response->toArray()['hydra:totalItems'];
 
-        $listeFormulaire = [];
-        $formulaire = $formulaire->toArray()['hydra:member'];
-        foreach($formulaire as $value){
-
-            if($value['relation'] == '/api/users/'. $idUser) {
-                array_push($listeFormulaire, $value['@id']);
-            }
-        }
-
-        $cptRenvoieSaisie = 0;
-        $listeReponse = $response->toArray()['hydra:member'];
-        foreach ($listeReponse as $value) {
-            if(in_array($value['fomulaire_id'], $listeFormulaire)) {
-                $cptRenvoieSaisie++;
-            }
-        }
-
-        return $cptRenvoieSaisie;
+        return $countRenvoie;
     }
 
     /**
@@ -265,43 +231,29 @@ class CallApiService
      * Renvoie les saisies d'un formulaire précis.
      */
     public function getRenvoieSaisieByForm($token, $idUser) {
-        $response = $this->getRenvoieSaisie($token);
 
-        $formulaire = $this->getForm($token);
+        $response = $this->client->request(
+            'GET',
+            'http://saisie/api/renvoie_saisies?fomulaire_id.relation='.$idUser, [
+                'headers' => ['Authorization' => 'Bearer '. $token],
+            ]
+        );
 
-        $listeFormulaire = [];
-        foreach($formulaire['hydra:member'] as $value){
-
-            if($value['relation'] == '/api/users/'. $idUser) {
-                array_push($listeFormulaire, $value['@id']);
-            }
-        }
+        $renvoie = $response->toArray()['hydra:member'];
 
         $listeSaisie = [];
-        $listeReponse = $response;
-        foreach ($listeReponse as $value) {
-            if(in_array($value['fomulaire_id'], $listeFormulaire)) {
-                array_push($listeSaisie, $value);
-            }
-        }
 
-        foreach($listeSaisie as $value) {
-            $username = $this->getByUri($token, $value['user_id']);
+        foreach($renvoie as $value) {
 
-            $nomForm = $this->client->request(
-                'GET',
-                'http://saisie'.$value['fomulaire_id'], [
-                    'headers' => ['Authorization' => 'Bearer '. $token],
-                ]
-            );
+            $username = $value['user_id']['username'];
+
+            $nomForm = $value['fomulaire_id']['nom'];
 
             if(array_key_exists('piecejointe', $value)){
-                $listeSaisie[] = array_merge(['username' => $username['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => $value['piecejointe']]);
+                $listeSaisie[] = array_merge(['username' => $username,'formulaire' => $nomForm,'saisie' => $value['saisie'], 'piecejointe' => $value['piecejointe']]);
             } else {
-                $listeSaisie[] = array_merge(['username' => $username['username'],'formulaire' => $nomForm->toArray()['nom'],'saisie' => $value['saisie'], 'piecejointe' => null]);
+                $listeSaisie[] = array_merge(['username' => $username,'formulaire' => $nomForm,'saisie' => $value['saisie'], 'piecejointe' => null]);
             }
-
-            array_shift($listeSaisie);
         }
 
         return $listeSaisie;
